@@ -1,0 +1,22 @@
+{
+  "name": "conflict-manager-client",
+  "version": "0.0.1",
+  "description": "git conflict manager client",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon start 7000"
+  },
+  "keywords": [
+    "git",
+    "conflict manager"
+  ],
+  "author": "H.Split",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "opn": "^5.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.8"
+  }
+}
