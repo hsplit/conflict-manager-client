@@ -4,7 +4,7 @@
   "description": "git conflict manager client",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon start 7000"
+    "dev": "nodemon start"
   },
   "keywords": [
     "git",
@@ -13,7 +13,9 @@
   "author": "H.Split",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "nodegit": "^0.23.0",
     "opn": "^5.4.0"
   },
   "devDependencies": {

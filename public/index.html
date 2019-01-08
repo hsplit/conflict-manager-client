@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conflict Manager</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <section class="step-1">
+        <h2>Step 1: set folder</h2>
+        <div class="content">
+            <div id="chooseFolderBtn" class="choose-folder">
+                <span>Choose folder</span>
+            </div>
+            <div>
+                <input id="folderInput" placeholder="full path to repository with .git" value="D:\ConflictManager\Client">
+            </div>
+        </div>
+        <div id="folderAnswer">Not chosen</div>
+    </section>
+    <hr>
+
+    <section>
+        <h2>Step 2: go to work</h2>
+        <button id="getStatus">Get Status</button>
+        <div id="myFiles"></div>
+    </section>
+    <hr>
+</body>
+<script src="js.js"></script>
+</html>
