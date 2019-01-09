@@ -15,6 +15,46 @@ const getPostData = data => ({
   body: JSON.stringify(data)
 })
 
+const getStatusesGroupsHTML = data => {
+  let groups = {
+    new: [],
+    modified: [],
+    renamed: [],
+    typechange: [],
+    ignored: [],
+  }
+
+  data.forEach(({ path, statuses }) => {
+    switch (true) {
+      case statuses.new: groups.new.push(path); break
+      case statuses.modified: groups.modified.push(path); break
+      case statuses.renamed: groups.renamed.push(path); break
+      case statuses.typechange: groups.typechange.push(path); break
+      case statuses.ignored: groups.ignored.push(path);
+    }
+  })
+
+  const getHTMLstring = (key, data) => data.length ? `<p><b>${key}:</b><p>` + data.join('<br>') + '</p></p>' : ''
+  const newHTML = getHTMLstring('New', groups.new)
+  const modifiedHTML = getHTMLstring('Modified', groups.modified)
+  const renamedHTML = getHTMLstring('Renamed', groups.renamed)
+  const typechangeHTML = getHTMLstring('Typechange', groups.typechange)
+  const ignoredHTML = getHTMLstring('Ignored', groups.ignored)
+
+  return newHTML + modifiedHTML + renamedHTML + typechangeHTML + ignoredHTML
+}
+
+const getStatus = () => {
+  fetch(API_REQUESTS.myStatus).then(response => response.json(), errorHanlde).then(data => {
+    let currentDate = new Date()
+    let formattedTime = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`
+    let timeInfo = 'Last update: ' + formattedTime
+    console.log(data)
+    myFiles.innerHTML = timeInfo + (data.length ? getStatusesGroupsHTML(data) : 'Have no any changes')
+    getStatus()
+  }, errorHanlde)
+}
+
 chooseFolderBtn.addEventListener('click', () => {
   const data = getPostData({ folder: folderInput.value })
   folderAnswer.innerText = 'loading...'
@@ -22,19 +62,9 @@ chooseFolderBtn.addEventListener('click', () => {
     console.log({ data })
     folderAnswer.innerText = data
     folderInput.value = ''
+
+    // start long poll
+    longPollStatus.innerText = 'Connected'
+    getStatus()
   })
-})
-
-
-getStatus.addEventListener('click', () => {
-  fetch(API_REQUESTS.myStatus).then(response => response.json(), errorHanlde).then(data => {
-    if (!data.length) {
-      myFiles.innerHTML = 'Have no any changes'
-    } else {
-      const getStatus = statuses => Object.entries(statuses).filter(el => el[1]).map(el => el[0]).join(', ')
-      const getHTML = ({ path, statuses }) => `<b>${path}</b>: <span>${getStatus(statuses)}</span>`
-      myFiles.innerHTML = data.map(el => getHTML(el)).join('<br>')
-    }
-    console.log(data)
-  }, errorHanlde)
 })

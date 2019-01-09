@@ -13,6 +13,7 @@ app.use(express.static(__dirname + '/public'))
 app.get('/favicon.ico', (request, response) => response.end(''))
 
 app.get('/mystatus', api.get.myStatus)
+
 app.post('/setfolder', jsonParser, api.post.setFolder)
 
 app.listen(port, _ => console.log(`start on http://localhost:${port}/`) && opn(`http://localhost:${port}/`))
