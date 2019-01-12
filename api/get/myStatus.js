@@ -13,7 +13,7 @@ let firstRequest = true
 module.exports = (request, response) => {
   const folderPath = folderService.getFolderPath()
 
-  if (!folderPath) { return response.status(500).json(ERROR) }
+  if (folderPath === undefined) { return response.status(500).json(ERROR) }
 
   nodegit.Repository.open(path.resolve(folderPath, './.git')).then(repo => {
     repo.getStatus().then(statuses => {
