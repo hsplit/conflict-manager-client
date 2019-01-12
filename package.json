@@ -4,7 +4,8 @@
   "description": "git conflict manager client",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon start"
+    "dev": "nodemon start",
+    "start": "node start"
   },
   "keywords": [
     "git",

@@ -8,7 +8,6 @@ let firstRequest = true
 
 module.exports = (request, response) => {
   const folderPath = folderService.getFolderPath()
-  console.log('myStatus folderPath', folderPath)
   nodegit.Repository.open(path.resolve(folderPath, './.git')).then(repo => {
     repo.getStatus().then(statuses => {
       const statusesToObj = status => {

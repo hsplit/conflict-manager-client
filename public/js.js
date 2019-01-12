@@ -49,8 +49,7 @@ const getStatus = () => {
     let currentDate = new Date()
     let formattedTime = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`
     let timeInfo = 'Last update: ' + formattedTime
-    console.log(data)
-    myFiles.innerHTML = timeInfo + (data.length ? getStatusesGroupsHTML(data) : 'Have no any changes')
+    myFiles.innerHTML = timeInfo + (data.length ? getStatusesGroupsHTML(data) : '<p>Have no any changes</p>')
     getStatus()
   }, errorHanlde)
 }
@@ -59,7 +58,6 @@ chooseFolderBtn.addEventListener('click', () => {
   const data = getPostData({ folder: folderInput.value })
   folderAnswer.innerText = 'loading...'
   fetch(API_REQUESTS.setFolder, data).then(response => response.text(), errorHanlde).then(data => {
-    console.log({ data })
     folderAnswer.innerText = data
     folderInput.value = ''
 

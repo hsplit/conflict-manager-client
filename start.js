@@ -16,4 +16,4 @@ app.get('/mystatus', api.get.myStatus)
 
 app.post('/setfolder', jsonParser, api.post.setFolder)
 
-app.listen(port, _ => console.log(`start on http://localhost:${port}/`) && opn(`http://localhost:${port}/`))
+app.listen(port, () => console.log(`start on http://localhost:${port}/`) || opn(`http://localhost:${port}/`))
