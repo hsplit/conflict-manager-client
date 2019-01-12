@@ -12,8 +12,11 @@ const jsonParser = bodyParser.json()
 app.use(express.static(__dirname + '/public'))
 app.get('/favicon.ico', (request, response) => response.end(''))
 
+// Get
 app.get('/mystatus', api.get.myStatus)
 
+// Post
 app.post('/setfolder', jsonParser, api.post.setFolder)
 
+// Start
 app.listen(port, () => console.log(`start on http://localhost:${port}/`) || opn(`http://localhost:${port}/`))

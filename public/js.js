@@ -4,7 +4,30 @@ const API_REQUESTS = {
   setFolder: `${API}/setfolder`,
 }
 
-const errorHanlde = err => console.warn(err)
+const HTML = {
+  chooseFolderBtn,
+  folderInput,
+  folderAnswer,
+  longPollStatus,
+  files,
+  conflicts,
+}
+
+const getCurrentTime = () => {
+  let currentDate = new Date()
+  const getTimePart = method => currentDate[method]().toString().padStart(2, '0')
+  return ['getHours', 'getMinutes', 'getSeconds'].map(el => getTimePart(el)).join(':')
+}
+
+const errorHanlder = data => {
+  if (data.error) {
+    HTML.files.innerHTML = 'Disconnected'
+    HTML.conflicts.innerHTML = 'Disconnected'
+    HTML.longPollStatus.innerHTML = data.error
+    throw new Error(data.error)
+  }
+  return data
+}
 
 const getPostData = data => ({
   method: 'POST',
@@ -44,25 +67,26 @@ const getStatusesGroupsHTML = data => {
   return newHTML + modifiedHTML + renamedHTML + typechangeHTML + ignoredHTML
 }
 
-const getStatus = () => {
-  fetch(API_REQUESTS.myStatus).then(response => response.json(), errorHanlde).then(data => {
-    let currentDate = new Date()
-    let formattedTime = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`
-    let timeInfo = 'Last update: ' + formattedTime
-    myFiles.innerHTML = timeInfo + (data.length ? getStatusesGroupsHTML(data) : '<p>Have no any changes</p>')
+const getStatus = (initialMessage) => {
+  fetch(API_REQUESTS.myStatus).then(response => response.json()).then(errorHanlder).then(data => {
+    if (initialMessage) { HTML.longPollStatus.innerText = initialMessage }
+
+    let timeInfo = 'Last update: ' + getCurrentTime()
+    HTML.files.innerHTML = timeInfo + (data.length ? getStatusesGroupsHTML(data) : '<p>Have no any changes</p>')
     getStatus()
-  }, errorHanlde)
+  }).catch(err => console.warn('getStatus', err))
 }
 
-chooseFolderBtn.addEventListener('click', () => {
-  const data = getPostData({ folder: folderInput.value })
-  folderAnswer.innerText = 'loading...'
-  fetch(API_REQUESTS.setFolder, data).then(response => response.text(), errorHanlde).then(data => {
-    folderAnswer.innerText = data
-    folderInput.value = ''
+const setFolder = () => {
+  const data = getPostData({ folder: HTML.folderInput.value })
+  HTML.folderAnswer.innerText = 'loading...'
+  fetch(API_REQUESTS.setFolder, data).then(response => response.text()).then(errorHanlder).then(data => {
+    HTML.folderAnswer.innerText = data
+    HTML.folderInput.value = ''
 
     // start long poll
-    longPollStatus.innerText = 'Connected'
-    getStatus()
-  })
-})
+    getStatus('Connected')
+  }).catch(err => console.warn('setFolder', err))
+}
+
+HTML.chooseFolderBtn.addEventListener('click', setFolder)

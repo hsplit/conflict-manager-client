@@ -4,10 +4,17 @@ const nodegit = require('nodegit')
 const folderService = require('../../services/folder')
 
 const LONG_POLL_DELAY = 5000
+const ERROR = {
+  error: `Can't open repository.`,
+}
+
 let firstRequest = true
 
 module.exports = (request, response) => {
   const folderPath = folderService.getFolderPath()
+
+  if (!folderPath) { return response.status(500).json(ERROR) }
+
   nodegit.Repository.open(path.resolve(folderPath, './.git')).then(repo => {
     repo.getStatus().then(statuses => {
       const statusesToObj = status => {
@@ -29,6 +36,6 @@ module.exports = (request, response) => {
       } else {
         setTimeout(() => response.json(info), LONG_POLL_DELAY)
       }
-    }, err => console.log(err))
-  }, err => console.log(err))
+    }, err => console.log(err) || response.json(ERROR))
+  }, err => console.log(err) || response.json(ERROR))
 }
