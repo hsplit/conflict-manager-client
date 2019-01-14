@@ -3,8 +3,8 @@ const nodegit = require('nodegit')
 
 let folderPath
 
-const _getSuccessMessage = () => `Folder set successfully: ${folderPath}`
-const _getErrorMessage = err => `Folder set with error: ${err}.\nCurrent folder: ${folderPath}`
+const _getSuccessMessage = () => `Folder set successfully: '${folderPath}'.`
+const _getErrorMessage = err => `Folder set with error: ${err}.\nCurrent folder: '${folderPath}'.`
 
 const getFolderPath = () => folderPath
 

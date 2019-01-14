@@ -70,9 +70,10 @@ const getStatusesGroupsHTML = data => {
 const getStatus = (initialMessage) => {
   fetch(API_REQUESTS.myStatus).then(response => response.json()).then(errorHanlder).then(data => {
     if (initialMessage) { HTML.longPollStatus.innerText = initialMessage }
+    const { myFiles, conflicts } = data
 
     let timeInfo = 'Last update: ' + getCurrentTime()
-    HTML.files.innerHTML = timeInfo + (data.length ? getStatusesGroupsHTML(data) : '<p>Have no any changes</p>')
+    HTML.files.innerHTML = timeInfo + (myFiles.length ? getStatusesGroupsHTML(myFiles) : '<p>Have no any changes</p>')
     getStatus()
   }).catch(err => console.warn('getStatus', err))
 }

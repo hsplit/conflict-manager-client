@@ -2,11 +2,11 @@ const path = require('path')
 const nodegit = require('nodegit')
 
 const folderService = require('../../services/folder')
+const serverService = require('../../services/server')
 
 const LONG_POLL_DELAY = 5000
-const ERROR = {
-  error: `Can't open repository.`,
-}
+const ERROR = { error: `Can't open repository.` }
+const SERVER_ERROR = { error: `Can't connect to server` }
 
 let firstRequest = true
 
@@ -32,9 +32,13 @@ module.exports = (request, response) => {
       let info = statuses.map(file => statusesToObj(file)).filter(el => Object.values(el.statuses).some(Boolean))
       if (firstRequest) {
         firstRequest = false
-        response.json(info)
+        serverService.getConflicts(info).then(data => {
+          response.json({ myFiles: info, conflicts: data })
+        }).catch(() => response.json({ myFiles: info, conflicts: SERVER_ERROR }))
       } else {
-        setTimeout(() => response.json(info), LONG_POLL_DELAY)
+        serverService.getConflicts(info).then(data => {
+          setTimeout(() => response.json({ myFiles: info, conflicts: data }), LONG_POLL_DELAY)
+        }).catch(() => setTimeout(() => response.json({ myFiles: info, conflicts: SERVER_ERROR }), LONG_POLL_DELAY))
       }
     }, err => console.log(err) || response.json(ERROR))
   }, err => console.log(err) || response.json(ERROR))
