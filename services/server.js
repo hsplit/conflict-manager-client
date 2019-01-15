@@ -7,7 +7,7 @@ const API_REQUESTS = {
   getConflicts: `${API}/getconflicts`,
 }
 
-const getPostData = data => ({
+const _getPostData = data => ({
   method: 'POST',
   headers: {
     'Accept': 'application/json',
@@ -16,7 +16,7 @@ const getPostData = data => ({
   body: JSON.stringify(data)
 })
 
-const getConflicts = files => fetch(API_REQUESTS.getConflicts, getPostData({ files, user: ownData.getUserName() }))
+const getConflicts = files => fetch(API_REQUESTS.getConflicts, _getPostData({ files, user: ownData.getUserName() }))
   .then(response => response.json())
 
 module.exports = {

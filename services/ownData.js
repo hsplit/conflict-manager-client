@@ -1,8 +1,8 @@
 const os = require('os')
 
-const userName = os.userInfo().username + '#' + Math.random()
+const _userName = os.userInfo().username + '#' + Math.random()
 
-const getUserName = () => userName
+const getUserName = () => _userName
 
 module.exports = {
   getUserName,

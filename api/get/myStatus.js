@@ -8,9 +8,9 @@ const LONG_POLL_DELAY = 5000
 const ERROR = { error: `Can't open repository.` }
 const SERVER_ERROR = { error: `Can't connect to server` }
 
-let firstRequest = true
+let _firstRequest = true
 
-const statusesToObj = status => {
+const _statusesToObj = status => {
   return {
     path: status.path(),
     statuses: {
@@ -30,9 +30,9 @@ module.exports = (request, response) => {
 
   nodegit.Repository.open(path.resolve(folderPath, './.git')).then(repo => {
     repo.getStatus().then(statuses => {
-      let info = statuses.map(statusesToObj).filter(el => Object.values(el.statuses).some(Boolean))
-      if (firstRequest) {
-        firstRequest = false
+      let info = statuses.map(_statusesToObj).filter(el => Object.values(el.statuses).some(Boolean))
+      if (_firstRequest) {
+        _firstRequest = false
         serverService.getConflicts(info).then(data => {
           response.json({ myFiles: info, conflicts: data })
         }).catch(() => response.json({ myFiles: info, conflicts: SERVER_ERROR }))

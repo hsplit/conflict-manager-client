@@ -1,17 +1,17 @@
 const path = require('path')
 const nodegit = require('nodegit')
 
-let folderPath
+let _folderPath
 
-const _getSuccessMessage = () => `Folder set successfully: '${folderPath}'.`
-const _getErrorMessage = err => `Folder set with error: ${err}.\nCurrent folder: '${folderPath}'.`
+const _getSuccessMessage = () => `Folder set successfully: '${_folderPath}'.`
+const _getErrorMessage = err => `Folder set with error: ${err}.\nCurrent folder: '${_folderPath}'.`
 
-const getFolderPath = () => folderPath
+const getFolderPath = () => _folderPath
 
-const setFolderPath = (_path, response) => {
-  console.log('Try to set folderPath', _path)
-  nodegit.Repository.open(path.resolve(_path, './.git')).then(() => {
-    folderPath = _path
+const setFolderPath = (folderPath, response) => {
+  console.log('Try to set folderPath', folderPath)
+  nodegit.Repository.open(path.resolve(folderPath, './.git')).then(() => {
+    _folderPath = folderPath
     console.log(_getSuccessMessage())
     response.send(_getSuccessMessage())
   }, err => response.send(_getErrorMessage(err)))
