@@ -10,6 +10,41 @@ const SERVER_ERROR = { error: `Can't connect to server` }
 
 let firstRequest = true
 
+const filesToGroups = files => {
+  let groups = {
+    new: [],
+    modified: [],
+    renamed: [],
+    typechange: [],
+    ignored: [],
+  }
+
+  files.forEach(({ path, statuses }) => {
+    switch (true) {
+      case statuses.new: groups.new.push(path); break
+      case statuses.modified: groups.modified.push(path); break
+      case statuses.renamed: groups.renamed.push(path); break
+      case statuses.typechange: groups.typechange.push(path); break
+      case statuses.ignored: groups.ignored.push(path);
+    }
+  })
+
+  return groups
+}
+
+const statusesToObj = status => {
+  return {
+    path: status.path(),
+    statuses: {
+      new: !!status.isNew(),
+      modified: !!status.isModified(),
+      typechange: !!status.isTypechange(),
+      renamed: !!status.isRenamed(),
+      ignored: !!status.isIgnored(),
+    }
+  }
+}
+
 module.exports = (request, response) => {
   const folderPath = folderService.getFolderPath()
 
@@ -17,19 +52,7 @@ module.exports = (request, response) => {
 
   nodegit.Repository.open(path.resolve(folderPath, './.git')).then(repo => {
     repo.getStatus().then(statuses => {
-      const statusesToObj = status => {
-        return {
-          path: status.path(),
-          statuses: {
-            new: !!status.isNew(),
-            modified: !!status.isModified(),
-            typechange: !!status.isTypechange(),
-            renamed: !!status.isRenamed(),
-            ignored: !!status.isIgnored(),
-          }
-        }
-      }
-      let info = statuses.map(file => statusesToObj(file)).filter(el => Object.values(el.statuses).some(Boolean))
+      let info = filesToGroups(statuses.map(statusesToObj).filter(el => Object.values(el.statuses).some(Boolean)))
       if (firstRequest) {
         firstRequest = false
         serverService.getConflicts(info).then(data => {

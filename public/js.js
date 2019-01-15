@@ -38,31 +38,13 @@ const getPostData = data => ({
   body: JSON.stringify(data)
 })
 
-const getStatusesGroupsHTML = data => {
-  let groups = {
-    new: [],
-    modified: [],
-    renamed: [],
-    typechange: [],
-    ignored: [],
-  }
-
-  data.forEach(({ path, statuses }) => {
-    switch (true) {
-      case statuses.new: groups.new.push(path); break
-      case statuses.modified: groups.modified.push(path); break
-      case statuses.renamed: groups.renamed.push(path); break
-      case statuses.typechange: groups.typechange.push(path); break
-      case statuses.ignored: groups.ignored.push(path);
-    }
-  })
-
-  const getHTMLstring = (key, data) => data.length ? `<p><b>${key}:</b><p>` + data.join('<br>') + '</p></p>' : ''
-  const newHTML = getHTMLstring('New', groups.new)
-  const modifiedHTML = getHTMLstring('Modified', groups.modified)
-  const renamedHTML = getHTMLstring('Renamed', groups.renamed)
-  const typechangeHTML = getHTMLstring('Typechange', groups.typechange)
-  const ignoredHTML = getHTMLstring('Ignored', groups.ignored)
+const getStatusesGroupsHTML = groups => {
+  const getHTMLString = (key, data) => data.length ? `<p><b>${key}:</b><p>` + data.join('<br>') + '</p></p>' : ''
+  const newHTML = getHTMLString('New', groups.new)
+  const modifiedHTML = getHTMLString('Modified', groups.modified)
+  const renamedHTML = getHTMLString('Renamed', groups.renamed)
+  const typechangeHTML = getHTMLString('Typechange', groups.typechange)
+  const ignoredHTML = getHTMLString('Ignored', groups.ignored)
 
   return newHTML + modifiedHTML + renamedHTML + typechangeHTML + ignoredHTML
 }
@@ -73,7 +55,8 @@ const getStatus = (initialMessage) => {
     const { myFiles, conflicts } = data
 
     let timeInfo = 'Last update: ' + getCurrentTime()
-    HTML.files.innerHTML = timeInfo + (myFiles.length ? getStatusesGroupsHTML(myFiles) : '<p>Have no any changes</p>')
+    let hasFiles = Object.values(myFiles).some(arr => arr.length)
+    HTML.files.innerHTML = timeInfo + (hasFiles ? getStatusesGroupsHTML(myFiles) : '<p>Have no any changes</p>')
     getStatus()
   }).catch(err => console.warn('getStatus', err))
 }
@@ -81,6 +64,7 @@ const getStatus = (initialMessage) => {
 const setFolder = () => {
   const data = getPostData({ folder: HTML.folderInput.value })
   HTML.folderAnswer.innerText = 'loading...'
+  HTML.longPollStatus.innerText = 'loading...'
   fetch(API_REQUESTS.setFolder, data).then(response => response.text()).then(errorHanlder).then(data => {
     HTML.folderAnswer.innerText = data
     HTML.folderInput.value = ''
