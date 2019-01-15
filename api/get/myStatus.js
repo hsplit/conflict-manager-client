@@ -10,28 +10,6 @@ const SERVER_ERROR = { error: `Can't connect to server` }
 
 let firstRequest = true
 
-const filesToGroups = files => {
-  let groups = {
-    new: [],
-    modified: [],
-    renamed: [],
-    typechange: [],
-    ignored: [],
-  }
-
-  files.forEach(({ path, statuses }) => {
-    switch (true) {
-      case statuses.new: groups.new.push(path); break
-      case statuses.modified: groups.modified.push(path); break
-      case statuses.renamed: groups.renamed.push(path); break
-      case statuses.typechange: groups.typechange.push(path); break
-      case statuses.ignored: groups.ignored.push(path);
-    }
-  })
-
-  return groups
-}
-
 const statusesToObj = status => {
   return {
     path: status.path(),
@@ -52,7 +30,7 @@ module.exports = (request, response) => {
 
   nodegit.Repository.open(path.resolve(folderPath, './.git')).then(repo => {
     repo.getStatus().then(statuses => {
-      let info = filesToGroups(statuses.map(statusesToObj).filter(el => Object.values(el.statuses).some(Boolean)))
+      let info = statuses.map(statusesToObj).filter(el => Object.values(el.statuses).some(Boolean))
       if (firstRequest) {
         firstRequest = false
         serverService.getConflicts(info).then(data => {

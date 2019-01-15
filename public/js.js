@@ -38,7 +38,31 @@ const getPostData = data => ({
   body: JSON.stringify(data)
 })
 
-const getStatusesGroupsHTML = groups => {
+const getStatusesGroupsHTML = files => {
+  const filesToGroups = files => {
+    let groups = {
+      new: [],
+      modified: [],
+      renamed: [],
+      typechange: [],
+      ignored: [],
+    }
+
+    files.forEach(({ path, statuses }) => {
+      switch (true) {
+        case statuses.new: groups.new.push(path); break
+        case statuses.modified: groups.modified.push(path); break
+        case statuses.renamed: groups.renamed.push(path); break
+        case statuses.typechange: groups.typechange.push(path); break
+        case statuses.ignored: groups.ignored.push(path);
+      }
+    })
+
+    return groups
+  }
+
+  const groups = filesToGroups(files)
+
   const getHTMLString = (key, data) => data.length ? `<p><b>${key}:</b><p>` + data.join('<br>') + '</p></p>' : ''
   const newHTML = getHTMLString('New', groups.new)
   const modifiedHTML = getHTMLString('Modified', groups.modified)
@@ -55,8 +79,7 @@ const getStatus = (initialMessage) => {
     const { myFiles, conflicts } = data
 
     let timeInfo = 'Last update: ' + getCurrentTime()
-    let hasFiles = Object.values(myFiles).some(arr => arr.length)
-    HTML.files.innerHTML = timeInfo + (hasFiles ? getStatusesGroupsHTML(myFiles) : '<p>Have no any changes</p>')
+    HTML.files.innerHTML = timeInfo + (myFiles.length ? getStatusesGroupsHTML(myFiles) : '<p>Have no any changes</p>')
     getStatus()
   }).catch(err => console.warn('getStatus', err))
 }
