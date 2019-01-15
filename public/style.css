@@ -3,6 +3,11 @@ body {
     background: linear-gradient(to right, #2c3e50, #3498db);
     color: white;
 }
+
+p {
+    margin-left: 10px;
+}
+
 .step-1 > .content {
     display: flex;
     margin-bottom: 10px;

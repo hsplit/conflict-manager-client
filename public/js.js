@@ -63,7 +63,7 @@ const getStatusesGroupsHTML = files => {
 
   const groups = filesToGroups(files)
 
-  const getHTMLString = (key, data) => data.length ? `<p><b>${key}:</b><p>` + data.join('<br>') + '</p></p>' : ''
+  const getHTMLString = (key, data) => data.length ? `<div><b>${key}:</b><p>` + data.join('<br>') + '</p></div>' : ''
   const newHTML = getHTMLString('New', groups.new)
   const modifiedHTML = getHTMLString('Modified', groups.modified)
   const renamedHTML = getHTMLString('Renamed', groups.renamed)
@@ -73,13 +73,19 @@ const getStatusesGroupsHTML = files => {
   return newHTML + modifiedHTML + renamedHTML + typechangeHTML + ignoredHTML
 }
 
+const getConflictsGroupsHTML = conflicts => {
+  const getHTMLString = (userName, files) => `<div><b>${userName}:</b><p>` + files.join('<br>') + '</p></div>'
+  return conflicts.map(({ userName, files }) => getHTMLString(userName, files)).join('')
+}
+
 const getStatus = (initialMessage) => {
   fetch(API_REQUESTS.myStatus).then(response => response.json()).then(errorHanlder).then(data => {
     if (initialMessage) { HTML.longPollStatus.innerText = initialMessage }
     const { myFiles, conflicts } = data
 
-    let timeInfo = 'Last update: ' + getCurrentTime()
+    let timeInfo = 'Last update: ' + getCurrentTime() + '<br><br>'
     HTML.files.innerHTML = timeInfo + (myFiles.length ? getStatusesGroupsHTML(myFiles) : '<p>Have no any changes</p>')
+    HTML.conflicts.innerHTML = conflicts.length ? getConflictsGroupsHTML(conflicts) : '<p>Have no any conflicts</p>'
     getStatus()
   }).catch(err => console.warn('getStatus', err))
 }
