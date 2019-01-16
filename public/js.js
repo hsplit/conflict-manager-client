@@ -2,6 +2,7 @@ const API = window.origin || 'http://localhost:5011'
 const API_REQUESTS = {
   myStatus: `${API}/mystatus`,
   setFolder: `${API}/setfolder`,
+  checkServerStatus: `${API}/checkserverstatus`,
 }
 
 const HTML = {
@@ -19,11 +20,15 @@ const getCurrentTime = () => {
   return ['getHours', 'getMinutes', 'getSeconds'].map(el => getTimePart(el)).join(':')
 }
 
+const showError = message => {
+  HTML.files.innerHTML = 'Disconnected'
+  HTML.conflicts.innerHTML = 'Disconnected'
+  HTML.longPollStatus.innerHTML = message
+}
+
 const errorHanlder = data => {
   if (data.error) {
-    HTML.files.innerHTML = 'Disconnected'
-    HTML.conflicts.innerHTML = 'Disconnected'
-    HTML.longPollStatus.innerHTML = data.error
+    showError(data.error)
     throw new Error(data.error)
   }
   return data
@@ -87,7 +92,7 @@ const getStatus = (initialMessage) => {
     HTML.files.innerHTML = timeInfo + (myFiles.length ? getStatusesGroupsHTML(myFiles) : '<p>Have no any changes</p>')
     HTML.conflicts.innerHTML = conflicts.length ? getConflictsGroupsHTML(conflicts) : '<p>Have no any conflicts</p>'
     getStatus()
-  }).catch(err => console.warn('getStatus', err))
+  }).catch(err => console.warn('getStatus', err) || showError('Lost connection'))
 }
 
 const setFolder = () => {
@@ -103,4 +108,21 @@ const setFolder = () => {
   }).catch(err => console.warn('setFolder', err))
 }
 
+const checkServerStatus = () => {
+  fetch(API_REQUESTS.checkServerStatus).then(response => response.json()).then(errorHanlder).then(data => {
+    const { folderPath } = data
+
+    if (folderPath) {
+      HTML.longPollStatus.innerText = 'Connected'
+      HTML.files.innerHTML = 'loading...'
+      HTML.conflicts.innerHTML = 'loading...'
+      HTML.folderAnswer.innerText = folderPath
+      getStatus()
+    } else {
+      HTML.longPollStatus.innerText = 'Disconnected'
+    }
+  }).catch(err => console.warn('checkServerStatus', err))
+}
+
 HTML.chooseFolderBtn.addEventListener('click', setFolder)
+checkServerStatus()
