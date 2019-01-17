@@ -4,7 +4,7 @@ const ownData = require('./ownData')
 const API = 'http://localhost:5010'
 
 const API_REQUESTS = {
-  getConflicts: `${API}/getconflicts`,
+  getConflicts: `${API}/getconflictsforuser`,
 }
 
 const _getPostData = data => ({

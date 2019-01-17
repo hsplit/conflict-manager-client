@@ -17,7 +17,7 @@ const HTML = {
 const getCurrentTime = () => {
   let currentDate = new Date()
   const getTimePart = method => currentDate[method]().toString().padStart(2, '0')
-  return ['getHours', 'getMinutes', 'getSeconds'].map(el => getTimePart(el)).join(':')
+  return ['getHours', 'getMinutes', 'getSeconds'].map(getTimePart).join(':')
 }
 
 const showError = message => {

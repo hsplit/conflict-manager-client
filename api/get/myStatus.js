@@ -1,10 +1,11 @@
 const path = require('path')
 const nodegit = require('nodegit')
 
+const { LONG_POLL_DELAY } = require('../../constants')
+
 const folderService = require('../../services/folder')
 const serverService = require('../../services/server')
 
-const LONG_POLL_DELAY = 5000
 const ERROR = { error: `Can't open repository.` }
 const SERVER_ERROR = { error: `Can't connect to server` }
 
