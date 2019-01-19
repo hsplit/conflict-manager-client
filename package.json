@@ -1,11 +1,11 @@
 {
   "name": "conflict-manager-client",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "git conflict manager client",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon start",
-    "start": "node start"
+    "dev": "nodemon start --port=5011",
+    "start": "node start --port=5011"
   },
   "keywords": [
     "git",
@@ -16,6 +16,7 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "minimist": "^1.2.0",
     "node-fetch": "^2.3.0",
     "nodegit": "^0.23.0",
     "opn": "^5.4.0"

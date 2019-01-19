@@ -1,5 +1,6 @@
 let ports = [5011, 5111, 5211]
-let port = !isNaN(+process.argv[2]) ? +process.argv[2] : ports[0]
+let argv = require('minimist')(process.argv.slice(2))
+let port = argv.port || ports[0]
 
 const express = require('express')
 const bodyParser = require('body-parser')
