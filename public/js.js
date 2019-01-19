@@ -135,10 +135,12 @@ const checkFile = e => {
   const errorFile = err => {
     HTML.fileAnswer.innerText = 'Error: ' + err + '.'
     HTML.usersFiles.innerHTML = ''
+    HTML.fileInput.value = ''
   }
   fetch(API_REQUESTS.checkFile, data).then(response => response.json()).then(errorHanlder).then(data => {
     const { fileName, usersFiles } = data
     HTML.fileAnswer.innerText = 'File: ' + fileName
+    HTML.fileInput.value = ''
     HTML.usersFiles.innerHTML = usersFiles.length
       ? '<br>' + getConflictsGroupsHTML(usersFiles)
       : '<p>Have no users files</p>'
