@@ -1,7 +1,11 @@
 const fetch = require('node-fetch')
+const fs = require('fs')
+const path = require('path')
+
 const ownData = require('./ownData')
 
-const API = 'http://localhost:5010'
+const { serverApi } = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../config.json')))
+const API = serverApi || 'http://localhost:5010'
 
 const API_REQUESTS = {
   getConflicts: `${API}/getconflictsforuser`,
