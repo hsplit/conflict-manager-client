@@ -1,4 +1,5 @@
-let port = !isNaN(+process.argv[2]) ? +process.argv[2] : 5011
+let ports = [5011, 5111, 5211]
+let port = !isNaN(+process.argv[2]) ? +process.argv[2] : ports[0]
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -21,4 +22,18 @@ app.post('/setfolder', jsonParser, api.post.setFolder)
 app.post('/checkfile', jsonParser, api.post.checkFile)
 
 // Start
-app.listen(port, () => console.log(`start on http://localhost:${port}/`) || opn(`http://localhost:${port}/`))
+const startServer = _port => {
+  app.listen(_port, () => console.log(`Start on http://localhost:${_port}/`) || opn(`http://localhost:${_port}/`))
+    .on('error', err => {
+      console.log(err)
+      if (_port) {
+        const indexCurrentPort = ports.indexOf(_port)
+        if (indexCurrentPort !== ports.length - 1) {
+          console.log('Try to change port')
+          startServer(ports[indexCurrentPort + 1])
+        }
+      }
+    })
+}
+
+startServer(port)
