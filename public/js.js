@@ -3,6 +3,7 @@ const API_REQUESTS = {
   myStatus: `${API}/mystatus`,
   setFolder: `${API}/setfolder`,
   checkServerStatus: `${API}/checkserverstatus`,
+  checkFile: `${API}/checkfile`,
 }
 
 const HTML = {
@@ -12,6 +13,9 @@ const HTML = {
   longPollStatus,
   files,
   conflicts,
+  fileInput,
+  fileAnswer,
+  usersFiles,
 }
 
 const getCurrentTime = () => {
@@ -124,5 +128,23 @@ const checkServerStatus = () => {
   }).catch(err => console.warn('checkServerStatus', err))
 }
 
+const checkFile = e => {
+  let fileName = e.target.files[0].name
+  HTML.fileAnswer.innerText = 'Loading...'
+  const data = getPostData({ fileName })
+  const errorFile = err => {
+    HTML.fileAnswer.innerText = 'Error: ' + err + '.'
+    HTML.usersFiles.innerHTML = ''
+  }
+  fetch(API_REQUESTS.checkFile, data).then(response => response.json()).then(errorHanlder).then(data => {
+    const { fileName, usersFiles } = data
+    HTML.fileAnswer.innerText = 'File: ' + fileName
+    HTML.usersFiles.innerHTML = usersFiles.length
+      ? '<br>' + getConflictsGroupsHTML(usersFiles)
+      : '<p>Have no users files</p>'
+  }).catch(err => console.warn('checkFile', err) || errorFile(err))
+}
+
 HTML.chooseFolderBtn.addEventListener('click', setFolder)
+HTML.fileInput.addEventListener('input', checkFile)
 checkServerStatus()

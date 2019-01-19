@@ -6,14 +6,15 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <section class="step-1">
+    <section class="choose-section">
         <h2>Repository Folder</h2>
         <div class="content">
-            <div id="chooseFolderBtn" class="choose-folder">
+            <div id="chooseFolderBtn" class="choose">
                 <span>Choose folder</span>
             </div>
             <div>
-                <input id="folderInput" placeholder="full path to repository with .git" value="D:\working project">
+                <!--TODO: delete value-->
+                <input id="folderInput" class="chooseInput" placeholder="full path to repository with .git" value="D:\working project">
             </div>
         </div>
         <div id="folderAnswer">Not chosen</div>
@@ -38,6 +39,20 @@
     <section>
         <h2>Conflicts</h2>
         <div id="conflicts">Wait for connection</div>
+    </section>
+
+    <hr>
+
+    <section class="choose-section">
+        <h2>Check file</h2>
+        <div class="content">
+            <label for="fileInput" class="choose">
+                <span>Choose file</span>
+            </label>
+            <input id="fileInput" class="chooseInput" type="file">
+        </div>
+        <div id="fileAnswer">Not chosen</div>
+        <div id="usersFiles"></div>
     </section>
 
     <hr>

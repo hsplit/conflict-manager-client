@@ -18,6 +18,7 @@ app.get('/checkserverstatus', api.get.checkServerStatus)
 
 // Post
 app.post('/setfolder', jsonParser, api.post.setFolder)
+app.post('/checkfile', jsonParser, api.post.checkFile)
 
 // Start
 app.listen(port, () => console.log(`start on http://localhost:${port}/`) || opn(`http://localhost:${port}/`))

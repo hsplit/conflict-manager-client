@@ -8,11 +8,11 @@ p {
   margin-left: 10px;
 }
 
-.step-1 > .content {
+.choose-section > .content {
   display: flex;
   margin-bottom: 10px;
 }
-.choose-folder {
+.choose {
   user-select: none;
   position: relative;
   overflow: hidden;
@@ -24,7 +24,7 @@ p {
   font-size: 19px;
   margin-right: 20px;
 }
-.choose-folder span {
+.choose span {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,11 +36,15 @@ p {
   cursor: pointer;
 }
 
-#folderInput {
+.chooseInput {
   width: 400px;
   height: 20px;
   padding: 8px 10px;
   font-size: 19px;
   border: 0;
   outline: none;
+}
+
+#fileInput {
+  display: none;
 }
