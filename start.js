@@ -21,6 +21,7 @@ app.get('/checkserverstatus', api.get.checkServerStatus)
 // Post
 app.post('/setfolder', jsonParser, api.post.setFolder)
 app.post('/checkfile', jsonParser, api.post.checkFile)
+app.post('/checkfileforday', jsonParser, api.post.checkFileForDay)
 
 // Start
 const startServer = _port => {

@@ -10,6 +10,7 @@ const API = serverApi || 'http://localhost:5010'
 const API_REQUESTS = {
   getConflicts: `${API}/getconflictsforuser`,
   checkFile: `${API}/checkfile`,
+  checkFileForDay: `${API}/checkfileforday`,
 }
 
 const _getPostData = data => ({
@@ -27,7 +28,11 @@ const getConflicts = files => fetch(API_REQUESTS.getConflicts, _getPostData({ fi
 const checkFile = file => fetch(API_REQUESTS.checkFile, _getPostData(file))
   .then(response => response.json())
 
+const checkFileForDay = file => fetch(API_REQUESTS.checkFileForDay, _getPostData(file))
+  .then(response => response.json())
+
 module.exports = {
   getConflicts,
   checkFile,
+  checkFileForDay,
 }

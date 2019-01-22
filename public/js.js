@@ -4,6 +4,7 @@ const API_REQUESTS = {
   setFolder: `${API}/setfolder`,
   checkServerStatus: `${API}/checkserverstatus`,
   checkFile: `${API}/checkfile`,
+  checkFileForDay: `${API}/checkfileforday`,
 }
 
 const HTML = {
@@ -16,12 +17,26 @@ const HTML = {
   fileInput,
   fileAnswer,
   usersFiles,
+  chooseFileBtnMongo,
+  fileInputMongo,
+  fileDateMongo,
+  fileAnswerMongo,
 }
 
 const getCurrentTime = () => {
   let currentDate = new Date()
   const getTimePart = method => currentDate[method]().toString().padStart(2, '0')
   return ['getHours', 'getMinutes', 'getSeconds'].map(getTimePart).join(':')
+}
+
+const getCurrentDate = () => {
+  let currentDate = new Date()
+  const getTimePart = method => currentDate[method]().toString().padStart(2, '0')
+  const getDatePart = (method, i) => (currentDate[method]() + i % 2).toString().padStart(4 - (i ? 2 : 0), '0')
+  return {
+    date: ['getFullYear', 'getMonth', 'getDate'].map(getDatePart).join('-'),
+    time: ['getHours', 'getMinutes', 'getSeconds'].map(getTimePart).join(':'),
+  }
 }
 
 const showError = message => {
@@ -130,23 +145,68 @@ const checkServerStatus = () => {
 
 const checkFile = e => {
   let fileName = e.target.files[0].name
-  HTML.fileAnswer.innerText = 'Loading...'
+  HTML.fileAnswer.innerHTML = 'Loading...'
   const data = getPostData({ fileName })
   const errorFile = err => {
-    HTML.fileAnswer.innerText = 'Error: ' + err + '.'
+    HTML.fileAnswer.innerHTML = 'Error: ' + err + '.'
     HTML.usersFiles.innerHTML = ''
     HTML.fileInput.value = ''
   }
-  fetch(API_REQUESTS.checkFile, data).then(response => response.json()).then(errorHanlder).then(data => {
+  const errorFileHandler = data => {
+    if (data.error) {
+      return errorFile(data.error)
+    }
+    return data
+  }
+  fetch(API_REQUESTS.checkFile, data).then(response => response.json()).then(errorFileHandler).then(data => {
     const { fileName, usersFiles } = data
-    HTML.fileAnswer.innerText = 'File: ' + fileName
+    HTML.fileAnswer.innerHTML = 'Last update: ' + getCurrentTime() + '<br><br>For file: ' + fileName
     HTML.fileInput.value = ''
     HTML.usersFiles.innerHTML = usersFiles.length
       ? '<br>' + getConflictsGroupsHTML(usersFiles)
       : '<p>Have no users files</p>'
-  }).catch(err => console.warn('checkFile', err) || errorFile(err))
+  }).catch(err => console.warn('checkFile', err))
 }
 
 HTML.chooseFolderBtn.addEventListener('click', setFolder)
 HTML.fileInput.addEventListener('input', checkFile)
 checkServerStatus()
+
+const checkFileForDay = () => {
+  if (!HTML.fileInputMongo.value || !HTML.fileDateMongo.value) {
+    HTML.fileAnswerMongo.innerHTML = 'Path should not be empty and date should be correct.'
+    return
+  }
+
+  const getFilesHTML = data => data.map(({ fileName, users }) => {
+    let fileNameHTML = `<i>${fileName}:</i><br>`
+    let usersHTML = `<p>${users.join(', ')}</p><br>`
+    return fileNameHTML + usersHTML
+  }).join('')
+
+  const errorHanlder = data => {
+    if (data.error) {
+      throw new Error(data.error)
+    }
+    return data
+  }
+
+  let file = HTML.fileInputMongo.value
+  let date = HTML.fileDateMongo.value
+  let data = getPostData({ file, date })
+  HTML.fileAnswerMongo.innerHTML = 'Loading...'
+  fetch(API_REQUESTS.checkFileForDay, data).then(response => response.json()).then(errorHanlder).then(data => {
+    let filePath = 'File: \'' + file + '\'.<br>'
+    let dateInfo = 'For: ' + date + '.<br><br>'
+    if (!data.length) {
+      HTML.fileAnswerMongo.innerHTML = filePath + dateInfo + 'Have no matches.'
+    } else {
+      HTML.fileAnswerMongo.innerHTML = filePath + dateInfo + getFilesHTML(data)
+    }
+  }).catch(err => HTML.fileAnswerMongo.innerHTML = 'Error: ' + err)
+}
+
+HTML.chooseFileBtnMongo.addEventListener('click', checkFileForDay)
+HTML.fileInputMongo.addEventListener('keydown', e => e.key === 'Enter' && checkFileForDay())
+
+HTML.fileDateMongo.value = getCurrentDate().date

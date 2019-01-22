@@ -48,3 +48,11 @@ p {
 #fileInput {
   display: none;
 }
+
+#fileDateMongo {
+  height: 20px;
+  padding: 8px 10px;
+  font-size: 19px;
+  border: 0;
+  outline: none;
+}
