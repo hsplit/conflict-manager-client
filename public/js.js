@@ -180,7 +180,7 @@ const checkFileForDay = () => {
 
   const getFilesHTML = data => data.map(({ fileName, users }) => {
     let fileNameHTML = `<i>${fileName}:</i><br>`
-    let usersHTML = `<p>${users.join(', ')}</p><br>`
+    let usersHTML = `<p>${users.join(', ')}</p>`
     return fileNameHTML + usersHTML
   }).join('')
 
@@ -196,7 +196,8 @@ const checkFileForDay = () => {
   let data = getPostData({ file, date })
   HTML.fileAnswerMongo.innerHTML = 'Loading...'
   fetch(API_REQUESTS.checkFileForDay, data).then(response => response.json()).then(errorHanlder).then(data => {
-    let filePath = 'File: \'' + file + '\'.<br>'
+    let now = getCurrentDate().time
+    let filePath = 'Last update: ' + now + '<br><br>File: \'' + file + '\'.<br>'
     let dateInfo = 'For: ' + date + '.<br><br>'
     if (!data.length) {
       HTML.fileAnswerMongo.innerHTML = filePath + dateInfo + 'Have no matches.'
