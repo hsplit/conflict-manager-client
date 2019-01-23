@@ -1,7 +1,11 @@
 const path = require('path')
 const nodegit = require('nodegit')
+const fs = require('fs')
 
 let _folderPath
+
+const { defaultValueFolder = '' } = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../config.json')))
+const getDefaultValueFolder = () => defaultValueFolder
 
 const getSuccessMessage = () => `Folder set successfully: '${_folderPath}'.`
 const _getErrorMessage = err => `Folder set with error: ${err}.\nCurrent folder: '${_folderPath}'.`
@@ -21,4 +25,5 @@ module.exports = {
   getFolderPath,
   setFolderPath,
   getSuccessMessage,
+  getDefaultValueFolder,
 }

@@ -17,6 +17,7 @@ app.get('/favicon.ico', (request, response) => response.end(''))
 // Get
 app.get('/mystatus', api.get.myStatus)
 app.get('/checkserverstatus', api.get.checkServerStatus)
+app.get('/getdefaultvaluefolder', api.get.getDefaultValueFolder)
 
 // Post
 app.post('/setfolder', jsonParser, api.post.setFolder)

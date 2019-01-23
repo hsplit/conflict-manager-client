@@ -5,6 +5,7 @@ const API_REQUESTS = {
   checkServerStatus: `${API}/checkserverstatus`,
   checkFile: `${API}/checkfile`,
   checkFileForDay: `${API}/checkfileforday`,
+  getDefaultValueFolder: `${API}/getdefaultvaluefolder`,
 }
 
 const HTML = {
@@ -206,6 +207,16 @@ const checkFileForDay = () => {
     }
   }).catch(err => HTML.fileAnswerMongo.innerHTML = 'Error: ' + err)
 }
+
+const getDefaultValueFolder = () => {
+  fetch(API_REQUESTS.getDefaultValueFolder).then(response => response.json()).then(data => {
+    console.log(data)
+    const { defaultValue } = data
+    HTML.folderInput.value = defaultValue
+  })
+}
+
+getDefaultValueFolder()
 
 HTML.chooseFileBtnMongo.addEventListener('click', checkFileForDay)
 HTML.fileInputMongo.addEventListener('keydown', e => e.key === 'Enter' && checkFileForDay())

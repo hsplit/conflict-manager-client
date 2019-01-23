@@ -1,3 +1,4 @@
 {
-  "serverApi": "http://localhost:5010"
+  "serverApi": "http://localhost:5010",
+  "defaultValueFolder": "D:\\working project"
 }
