@@ -7,19 +7,12 @@ const bodyParser = require('body-parser')
 const opn = require('opn')
 
 const api = require('./api')
+const security = require('./services/security')
 
 const app = express()
 const jsonParser = bodyParser.json()
 
-app.use((request, response, next) => {
-  // TODO: add secret pass for phone by uid
-  if (request.ip !== '::1' && request.ip !== '::ffff:127.0.0.1') {
-    console.log('Blocked request for:', { ip: request.ip, hostname: request.hostname })
-    response.status(423).send()
-  } else {
-    next()
-  }
-})
+app.use(security)
 
 app.use(express.static(__dirname + '/public'))
 app.get('/favicon.ico', (request, response) => response.end(''))
