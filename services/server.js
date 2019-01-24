@@ -31,8 +31,11 @@ const checkFile = file => fetch(API_REQUESTS.checkFile, _getPostData(file))
 const checkFileForDay = file => fetch(API_REQUESTS.checkFileForDay, _getPostData(file))
   .then(response => response.json())
 
+const getServerApi = () => API
+
 module.exports = {
   getConflicts,
   checkFile,
   checkFileForDay,
+  getServerApi,
 }

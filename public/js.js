@@ -6,9 +6,11 @@ const API_REQUESTS = {
   checkFile: `${API}/checkfile`,
   checkFileForDay: `${API}/checkfileforday`,
   getDefaultValueFolder: `${API}/getdefaultvaluefolder`,
+  getServerApi: `${API}/getserverapi`,
 }
 
 const HTML = {
+  linkServer,
   chooseFolderBtn,
   folderInput,
   folderAnswer,
@@ -216,7 +218,16 @@ const getDefaultValueFolder = () => {
   })
 }
 
+const getServerApi = () => {
+  fetch(API_REQUESTS.getServerApi).then(response => response.json()).then(data => {
+    const { serverApi } = data
+    HTML.linkServer.href = serverApi
+    HTML.linkServer.innerHTML = '<h3>Server</h3>'
+  })
+}
+
 getDefaultValueFolder()
+getServerApi()
 
 HTML.chooseFileBtnMongo.addEventListener('click', checkFileForDay)
 HTML.fileInputMongo.addEventListener('keydown', e => e.key === 'Enter' && checkFileForDay())

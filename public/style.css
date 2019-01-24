@@ -8,6 +8,14 @@ p {
   margin-left: 10px;
 }
 
+section:first-of-type {
+  text-align: center;
+}
+
+a {
+  color: #ffffff;
+}
+
 .choose-section > .content {
   display: flex;
   margin-bottom: 10px;
