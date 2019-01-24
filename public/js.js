@@ -137,6 +137,7 @@ const checkServerStatus = () => {
       HTML.files.innerHTML = 'loading...'
       HTML.conflicts.innerHTML = 'loading...'
       HTML.folderAnswer.innerText = folderPath
+      HTML.folderInput.value = ''
       getStatus()
     } else {
       HTML.longPollStatus.innerText = 'Disconnected'
@@ -210,7 +211,6 @@ const checkFileForDay = () => {
 
 const getDefaultValueFolder = () => {
   fetch(API_REQUESTS.getDefaultValueFolder).then(response => response.json()).then(data => {
-    console.log(data)
     const { defaultValue } = data
     HTML.folderInput.value = defaultValue
   })
