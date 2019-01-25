@@ -28,6 +28,13 @@ app.post('/setfolder', jsonParser, api.post.setFolder)
 app.post('/checkfile', jsonParser, api.post.checkFile)
 app.post('/checkfileforday', jsonParser, api.post.checkFileForDay)
 
+// 404
+app.use((request, response) => response.send(
+  '404 There may be funny cats, ' +
+  'but I\'m tired, I\'m sorry, ' +
+  'but you shouldn\'t lose hope, maybe they will appear soon. Have a nice day!'
+))
+
 // Start
 const startServer = _port => {
   app.listen(_port, () => console.log(`Start on http://localhost:${_port}/`) || opn(`http://localhost:${_port}/`))
