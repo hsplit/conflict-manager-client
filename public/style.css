@@ -64,3 +64,125 @@ a {
   border: 0;
   outline: none;
 }
+
+#chat {
+  position: fixed;
+  bottom: 0;
+  right: 10px;
+  width: 350px;
+  border: 1px solid #232526;
+  box-sizing: border-box;
+}
+
+#chatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 43px;
+  background: linear-gradient(to right, #232526, #414345);
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.chatHeaderOpened {
+  border-bottom: 1px solid #232526;
+}
+
+#chatIcon {
+  left: 10px;
+  bottom: 6px;
+  position: relative;
+}
+
+.chatIconOpened {
+  bottom: -13px !important;
+}
+
+#chatStatus {
+  color: #c04848;
+}
+.online {
+  color: #00bf8f !important;
+}
+
+#chatBody {
+  background: linear-gradient(to right, #c0c0aa, #1cefff);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 0;
+  overflow: hidden;
+}
+
+.chatOpened {
+  height: 408px !important;
+}
+
+#messages {
+  padding: 0 15px;
+  overflow: auto;
+}
+
+.message {
+  width: 100%;
+  margin: 5px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sending {
+  display: inline-block;
+  animation: rotate-center 1s ease-in-out infinite;
+}
+
+.otherUser {
+  justify-content: flex-start;
+}
+
+.messageContent {
+  max-width: 80%;
+  padding: 10px;
+  border-radius: 10px 10px 10px 0;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+  font-size: 13px;
+}
+
+.myMessage {
+  border-radius: 10px 10px 0 10px;
+}
+
+.signature {
+  font-size: 12px;
+  text-align: right;
+}
+
+#inputChat {
+  border: none;
+  height: 40px;
+  padding: 0 15px;
+  flex-shrink: 0;
+}
+
+@-webkit-keyframes rotate-center {
+  0% {
+    -webkit-transform: rotate(0);
+    transform: rotate(0);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes rotate-center {
+  0% {
+    -webkit-transform: rotate(0);
+    transform: rotate(0);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}

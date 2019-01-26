@@ -6,6 +6,7 @@ const ownData = require('./ownData')
 
 const { serverApi } = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../config.json')))
 const API = serverApi || 'http://localhost:5010'
+const _port = +API.substr(-4)
 
 const API_REQUESTS = {
   getConflicts: `${API}/getconflictsforuser`,
@@ -31,7 +32,8 @@ const checkFile = file => fetch(API_REQUESTS.checkFile, _getPostData(file))
 const checkFileForDay = file => fetch(API_REQUESTS.checkFileForDay, _getPostData(file))
   .then(response => response.json())
 
-const getServerApi = () => API
+const getServerApi = () =>
+  ({ serverApi: API, serverWS: API.replace('http', 'ws').replace(_port, _port + 105), userName: ownData.getUserName() })
 
 module.exports = {
   getConflicts,

@@ -1,5 +1,5 @@
 const serverService = require('../../services/server')
 
 module.exports = (request, response) => {
-  response.json({ serverApi: serverService.getServerApi() })
+  response.json({ ...serverService.getServerApi() })
 }

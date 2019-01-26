@@ -24,6 +24,15 @@ const HTML = {
   fileInputMongo,
   fileDateMongo,
   fileAnswerMongo,
+  chat,
+  chatHeader,
+  chatBody,
+  chatStatus,
+  chatIcon,
+  iconPath,
+  unreadMessages,
+  inputChat,
+  messages,
 }
 
 const getCurrentTime = () => {
@@ -45,10 +54,11 @@ const getCurrentDate = () => {
 const showError = message => {
   HTML.files.innerHTML = 'Disconnected'
   HTML.conflicts.innerHTML = 'Disconnected'
+  HTML.folderAnswer.innerText = 'Disconnected'
   HTML.longPollStatus.innerHTML = message
 }
 
-const errorHanlder = data => {
+const errorHandler = data => {
   if (data.error) {
     showError(data.error)
     throw new Error(data.error)
@@ -60,7 +70,7 @@ const getPostData = data => ({
   method: 'POST',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
   body: JSON.stringify(data)
 })
@@ -106,7 +116,7 @@ const getConflictsGroupsHTML = conflicts => {
 }
 
 const getStatus = (initialMessage) => {
-  fetch(API_REQUESTS.myStatus).then(response => response.json()).then(errorHanlder).then(data => {
+  fetch(API_REQUESTS.myStatus).then(response => response.json()).then(errorHandler).then(data => {
     if (initialMessage) { HTML.longPollStatus.innerText = initialMessage }
     const { myFiles, conflicts } = data
 
@@ -121,17 +131,17 @@ const setFolder = () => {
   const data = getPostData({ folder: HTML.folderInput.value })
   HTML.folderAnswer.innerText = 'loading...'
   HTML.longPollStatus.innerText = 'loading...'
-  fetch(API_REQUESTS.setFolder, data).then(response => response.text()).then(errorHanlder).then(data => {
+  fetch(API_REQUESTS.setFolder, data).then(response => response.text()).then(errorHandler).then(data => {
     HTML.folderAnswer.innerText = data
     HTML.folderInput.value = ''
 
     // start long poll
     getStatus('Connected')
-  }).catch(err => console.warn('setFolder', err))
+  }).catch(err => console.warn('setFolder', err) || showError(err))
 }
 
 const checkServerStatus = () => {
-  fetch(API_REQUESTS.checkServerStatus).then(response => response.json()).then(errorHanlder).then(data => {
+  fetch(API_REQUESTS.checkServerStatus).then(response => response.json()).then(errorHandler).then(data => {
     const { folderPath } = data
 
     if (folderPath) {
@@ -158,7 +168,7 @@ const checkFile = e => {
   }
   const errorFileHandler = data => {
     if (data.error) {
-      return errorFile(data.error)
+      throw new Error(data.error)
     }
     return data
   }
@@ -169,7 +179,7 @@ const checkFile = e => {
     HTML.usersFiles.innerHTML = usersFiles.length
       ? '<br>' + getConflictsGroupsHTML(usersFiles)
       : '<p>Have no users files</p>'
-  }).catch(err => console.warn('checkFile', err))
+  }).catch(err => console.warn('checkFile', err) || errorFile(err))
 }
 
 HTML.chooseFolderBtn.addEventListener('click', setFolder)
@@ -188,7 +198,7 @@ const checkFileForDay = () => {
     return fileNameHTML + usersHTML
   }).join('')
 
-  const errorHanlder = data => {
+  const errorHandler = data => {
     if (data.error) {
       throw new Error(data.error)
     }
@@ -199,7 +209,7 @@ const checkFileForDay = () => {
   let date = HTML.fileDateMongo.value
   let data = getPostData({ file, date })
   HTML.fileAnswerMongo.innerHTML = 'Loading...'
-  fetch(API_REQUESTS.checkFileForDay, data).then(response => response.json()).then(errorHanlder).then(data => {
+  fetch(API_REQUESTS.checkFileForDay, data).then(response => response.json()).then(errorHandler).then(data => {
     let now = getCurrentDate().time
     let filePath = 'Last update: ' + now + '<br><br>File: \'' + file + '\'.<br>'
     let dateInfo = 'For: ' + date + '.<br><br>'
@@ -218,18 +228,179 @@ const getDefaultValueFolder = () => {
   })
 }
 
-const getServerApi = () => {
-  fetch(API_REQUESTS.getServerApi).then(response => response.json()).then(data => {
-    const { serverApi } = data
-    HTML.linkServer.href = serverApi
-    HTML.linkServer.innerHTML = '<h3>Server</h3>'
-  })
-}
-
 getDefaultValueFolder()
-getServerApi()
 
 HTML.chooseFileBtnMongo.addEventListener('click', checkFileForDay)
 HTML.fileInputMongo.addEventListener('keydown', e => e.key === 'Enter' && checkFileForDay())
 
 HTML.fileDateMongo.value = getCurrentDate().date
+
+// -----------------------------------------------------------------------------------------
+const pathOpened = 'M229.5,71.4l81.6,81.6l35.7-35.7L229.5,0L112.2,117.3l35.7,35.7L229.5,71.4z'
+const pathClosed = 'M229.5,387.6L147.9,306l-35.7,35.7L229.5,459l117.3-117.3L311.1,306L229.5,387.6z'
+
+const messagesData = []
+let isChatOpened = false
+let unreadMessagesCount = 0
+const toggleChat = () => {
+  if (isChatOpened) {
+    isChatOpened = false
+    HTML.iconPath.setAttribute('d', pathClosed)
+  } else {
+    isChatOpened = true
+    HTML.unreadMessages.textContent = ''
+    unreadMessagesCount = 0
+    HTML.iconPath.setAttribute('d', pathOpened)
+  }
+  HTML.chatHeader.classList.toggle('chatHeaderOpened')
+  HTML.chatIcon.classList.toggle('chatIconOpened')
+  HTML.chatBody.classList.toggle('chatOpened')
+}
+
+HTML.chatHeader.addEventListener('click', toggleChat)
+
+const getMessageHTML = message => {
+  const { userName, text, time, delivered, updated } = message
+
+  return `<div class="message ${userName ? 'otherUser' : ''}">
+            <div class="messageContent ${!userName ? 'myMessage' : ''}">
+              ${text.replace(/\n/g,'<br><br>')}
+              <hr>
+              <div class="signature">
+                <span>${userName ? userName : ''} <span>
+                <span>${time + (updated ? ' (upd)' : '')}<span>
+                ${!userName && !delivered ? '&nbsp;' : ''}
+                <span class="${!userName && !delivered ? 'sending' : ''}">
+                  ${userName ? '' : delivered ? ' ✓' : ' ⏳'}
+                </span>
+              </div>
+            </div>
+          </div>`
+}
+
+const renderMessages = () => {
+  const isNeedScroll = HTML.messages.scrollTop + HTML.messages.clientHeight === HTML.messages.scrollHeight
+  HTML.messages.innerHTML = messagesData.map(getMessageHTML).join('')
+  if (isNeedScroll) {
+    HTML.messages.scrollTop = HTML.messages.scrollHeight
+  }
+}
+
+document.addEventListener('wheel', event => {
+  if (event.target.closest('#chatHeader') || event.target.closest('#inputChat')) {
+    event.preventDefault()
+  }
+  if (event.target.closest('#messages')) {
+    const target = HTML.messages
+    if(target.scrollHeight - target.scrollTop === target.clientHeight && event.deltaY > 0) {
+      event.preventDefault()
+    } else if(target.scrollTop === 0 && event.deltaY < 0) {
+      event.preventDefault()
+    }
+  }
+})
+
+const setStatus = status => {
+  if  (status === 'Online') {
+    HTML.chatStatus.classList.add('online')
+  } else {
+    HTML.chatStatus.classList.remove('online')
+  }
+  HTML.chatStatus.innerText = status
+}
+
+const startWSChat = (serverWS, userName) => {
+  let ws = new WebSocket(serverWS)
+
+  const getMessage = ({ id, time, text, userName }) => {
+    if (!isChatOpened) {
+      HTML.unreadMessages.textContent = '(' + ++unreadMessagesCount + ')'
+    }
+    if (id !== undefined) {
+      messagesData[id].time = time
+      messagesData[id].delivered = true
+    } else {
+      let lastIndex = messagesData.length - 1
+      let shouldUpdate = messagesData[lastIndex]
+        && messagesData[lastIndex].userName === userName
+      if (shouldUpdate) {
+        messagesData[lastIndex].text = messagesData[lastIndex].text + '\n' + text
+        messagesData[lastIndex].time = time
+        messagesData[lastIndex].updated = true
+      } else {
+        messagesData.push({ userName, text, time })
+      }
+    }
+  }
+
+  const send = e => {
+    if (e.key !== 'Enter' || !HTML.inputChat.value) {
+      return
+    }
+    let text = HTML.inputChat.value
+
+    const sendMessage = () => {
+      let shouldUpdate = messagesData[messagesData.length - 1]
+        && messagesData[messagesData.length - 1].userName === undefined
+      if (shouldUpdate) {
+        messagesData[messagesData.length - 1] = {
+          text:  messagesData[messagesData.length - 1].text + '\n' + text,
+          time: getCurrentTime(),
+          delivered: false,
+        }
+        return messagesData.length - 1
+      } else {
+        return -1 + messagesData.push({
+          text,
+          time: getCurrentTime(),
+          delivered: false,
+        })
+      }
+    }
+
+    ws.send(JSON.stringify({
+      text,
+      userName,
+      id: sendMessage(),
+    }))
+    HTML.inputChat.value = ''
+  }
+
+  const reconnecting = () => {
+    ws.onclose = () => {}
+    ws.close()
+    ws = new WebSocket(serverWS)
+    setListeners()
+  }
+
+  const setListeners = () => {
+    ws.onopen = () => {
+      setStatus('Online')
+      HTML.inputChat.addEventListener('keydown', send)
+    }
+    ws.onclose = () => {
+      setStatus('Offline')
+      HTML.inputChat.removeEventListener('keydown', send)
+      console.log('onclose')
+      setTimeout(reconnecting, 1000)
+    }
+    ws.onerror = err => console.warn(err)
+    ws.onmessage = res => {
+      getMessage(JSON.parse(res.data))
+      renderMessages()
+    }
+  }
+
+  setListeners()
+}
+
+const getServerApi = () => {
+  fetch(API_REQUESTS.getServerApi).then(response => response.json()).then(data => {
+    const { serverApi, serverWS, userName } = data
+    startWSChat(serverWS, userName)
+    HTML.linkServer.href = serverApi
+    HTML.linkServer.innerHTML = '<h3>Server</h3>'
+  })
+}
+
+getServerApi()
