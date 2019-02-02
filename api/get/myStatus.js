@@ -27,7 +27,10 @@ const _statusesToObj = status => {
 module.exports = (request, response) => {
   const folderPath = folderService.getFolderPath()
 
-  if (folderPath === undefined) { return response.status(500).json(ERROR) }
+  if (folderPath === undefined) {
+    setTimeout(() => response.status(500).json(ERROR), LONG_POLL_DELAY)
+    return
+  }
 
   nodegit.Repository.open(path.resolve(folderPath, './.git')).then(repo => {
     repo.getStatus().then(statuses => {

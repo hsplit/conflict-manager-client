@@ -16,6 +16,11 @@ a {
   color: #ffffff;
 }
 
+#token {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .choose-section > .content {
   display: flex;
   margin-bottom: 10px;

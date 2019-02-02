@@ -22,6 +22,7 @@ app.get('/mystatus', api.get.myStatus)
 app.get('/checkserverstatus', api.get.checkServerStatus)
 app.get('/getdefaultvaluefolder', api.get.getDefaultValueFolder)
 app.get('/getserverapi', api.get.getServerApi)
+app.get('/getmytoken', api.get.getMyToken)
 
 // Post
 app.post('/setfolder', jsonParser, api.post.setFolder)

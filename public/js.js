@@ -7,6 +7,7 @@ const API_REQUESTS = {
   checkFileForDay: `${API}/checkfileforday`,
   getDefaultValueFolder: `${API}/getdefaultvaluefolder`,
   getServerApi: `${API}/getserverapi`,
+  getMyToken: `${API}/getmytoken`,
 }
 
 const HTML = {
@@ -33,7 +34,26 @@ const HTML = {
   unreadMessages,
   inputChat,
   messages,
+  token,
 }
+
+const getMyToken = () => {
+  fetch(API_REQUESTS.getMyToken, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'token': '1231321',
+    },
+  }).then(response => response.text()).then(token => {
+    alert('Your private token: ' + token)
+  }).catch(err => alert('Error: ' + err))
+}
+
+HTML.token.addEventListener('click', e => {
+  e.preventDefault()
+  getMyToken()
+})
 
 const getCurrentTime = () => {
   let currentDate = new Date()
@@ -68,11 +88,11 @@ const errorHandler = data => {
 
 const getPostData = data => ({
   method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-  body: JSON.stringify(data)
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
 })
 
 const getStatusesGroupsHTML = files => {
@@ -381,7 +401,6 @@ const startWSChat = (serverWS, userName) => {
     ws.onclose = () => {
       setStatus('Offline')
       HTML.inputChat.removeEventListener('keydown', send)
-      console.log('onclose')
       setTimeout(reconnecting, 1000)
     }
     ws.onerror = err => console.warn(err)
