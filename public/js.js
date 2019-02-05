@@ -418,7 +418,7 @@ const getServerApi = () => {
     const { serverApi, serverWS, userName } = data
     startWSChat(serverWS, userName)
     HTML.linkServer.href = serverApi
-    HTML.linkServer.innerHTML = '<h3>Server</h3>'
+    HTML.linkServer.innerHTML = '<h3>Go to Server</h3>'
   })
 }
 
