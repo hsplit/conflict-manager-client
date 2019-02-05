@@ -1,4 +1,4 @@
-const ownData = require('./ownData')
+const ownData = srcRequire('services/ownData')
 
 module.exports = (request, response, next) => {
   if (request.ip === '::1' || request.ip === '::ffff:127.0.0.1' || request.headers.token === ownData.getMyToken()) {

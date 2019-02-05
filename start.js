@@ -5,9 +5,10 @@ let port = argv.port || ports[0]
 const express = require('express')
 const bodyParser = require('body-parser')
 const opn = require('opn')
+require('./config/srcRequire')
 
-const api = require('./api')
-const security = require('./services/security')
+const api = srcRequire('api')
+const security = srcRequire('services/security')
 
 const app = express()
 const jsonParser = bodyParser.json()

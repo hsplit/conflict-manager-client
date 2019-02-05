@@ -1,4 +1,4 @@
-const folderService = require('../../services/folder')
+const folderService = srcRequire('services/folder')
 
 module.exports = (request, response) => {
   response.json({ defaultValue: folderService.getDefaultValueFolder() })
