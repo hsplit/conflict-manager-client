@@ -1,4 +1,4 @@
-const folderService = srcRequire('services/folder')
+const folderService = require('services/folder')
 
 module.exports = (request, response) => {
   const folderPath = folderService.getFolderPath()

@@ -1,4 +1,4 @@
-const ownData = srcRequire('services/ownData')
+const ownData = require('services/ownData')
 
 module.exports = (request, response) => {
   response.send(ownData.getMyToken())

@@ -5,10 +5,10 @@ let port = argv.port || ports[0]
 const express = require('express')
 const bodyParser = require('body-parser')
 const opn = require('opn')
-require('./config/srcRequire')
+require('./configuration')
 
-const api = srcRequire('api')
-const security = srcRequire('services/security')
+const api = require('api')
+const security = require('services/security')
 
 const app = express()
 const jsonParser = bodyParser.json()
@@ -34,7 +34,7 @@ app.post('/checkfileforday', jsonParser, api.post.checkFileForDay)
 app.use((request, response) => response.send(
   '404 There may be funny cats, ' +
   'but I\'m tired, I\'m sorry, ' +
-  'but you shouldn\'t lose hope, maybe they will appear soon. Have a nice day!'
+  'but you shouldn\'t lose hope, maybe they will appear soon. Have a nice day! ツ'
 ))
 
 // Start

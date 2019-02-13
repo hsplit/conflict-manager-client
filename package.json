@@ -1,6 +1,6 @@
 {
   "name": "conflict-manager-client",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "description": "git conflict manager client",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "minimist": "^1.2.0",
+    "module-alias": "^2.2.0",
     "node-fetch": "^2.3.0",
     "node-machine-id": "^1.1.10",
     "nodegit": "^0.23.0",
