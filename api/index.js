@@ -1,7 +1,9 @@
-const get = require('./get')
-const post = require('./post')
+const connection = require('./connection')
+const settings = require('./settings')
+const server = require('./server')
 
 module.exports = {
-  get,
-  post,
+  connection,
+  settings,
+  server,
 }

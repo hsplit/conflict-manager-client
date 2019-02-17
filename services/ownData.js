@@ -1,12 +1,10 @@
 const os = require('os')
 const machineIdSync = require('node-machine-id').machineIdSync
 
-const _userName = `${os.userInfo().username}(${machineIdSync().slice(-5)})#${Math.random()}`
-
-const getUserName = () => _userName
-const getMyToken = () => _userName.split('#')[1].slice(-5)
+const userName = `${os.userInfo().username}(${machineIdSync().slice(-5)})#${Math.random()}`
+const myToken = userName.split('#')[1].slice(-5)
 
 module.exports = {
-  getUserName,
-  getMyToken,
+  userName,
+  myToken,
 }

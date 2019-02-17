@@ -1,66 +1,23 @@
 const API = window.origin || 'http://localhost:5011'
+const API_ROUTES = {
+  settings: `${API}/settings`,
+  connection: `${API}/connection`,
+  server: `${API}/server`,
+}
 const API_REQUESTS = {
-  myStatus: `${API}/mystatus`,
-  setFolder: `${API}/setfolder`,
-  checkServerStatus: `${API}/checkserverstatus`,
-  checkFile: `${API}/checkfile`,
-  checkFileForDay: `${API}/checkfileforday`,
-  getDefaultValueFolder: `${API}/getdefaultvaluefolder`,
-  getServerApi: `${API}/getserverapi`,
-  getMyToken: `${API}/getmytoken`,
+  setFolder: `${API_ROUTES.settings}/setfolder`,
+  getDefaultValueFolder: `${API_ROUTES.settings}/getdefaultvaluefolder`,
+  getServerApi: `${API_ROUTES.settings}/getserverapi`,
+  getMyToken: `${API_ROUTES.settings}/getmytoken`,
+
+  checkServerStatus: `${API_ROUTES.connection}/checkserverstatus`,
+  myStatus: `${API_ROUTES.connection}/mystatus`,
+
+  checkFile: `${API_ROUTES.server}/checkfile`,
+  checkFileForDay: `${API_ROUTES.server}/checkfileforday`,
 }
 
-const HTML = {
-  linkServer,
-  chooseFolderBtn,
-  folderInput,
-  folderAnswer,
-  longPollStatus,
-  files,
-  conflicts,
-  fileInput,
-  fileAnswer,
-  usersFiles,
-  chooseFileBtnMongo,
-  fileInputMongo,
-  fileDateMongo,
-  fileAnswerMongo,
-  chat,
-  chatHeader,
-  chatBody,
-  chatStatus,
-  chatIcon,
-  iconPath,
-  unreadMessages,
-  inputChat,
-  messages,
-  token,
-}
-
-const getMyToken = () => {
-  fetch(API_REQUESTS.getMyToken, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'token': '1231321',
-    },
-  }).then(response => response.text()).then(token => {
-    alert('Your private token: ' + token)
-  }).catch(err => alert('Error: ' + err))
-}
-
-HTML.token.addEventListener('click', e => {
-  e.preventDefault()
-  getMyToken()
-})
-
-const getCurrentTime = () => {
-  let currentDate = new Date()
-  const getTimePart = method => currentDate[method]().toString().padStart(2, '0')
-  return ['getHours', 'getMinutes', 'getSeconds'].map(getTimePart).join(':')
-}
-
+// Common
 const getCurrentDate = () => {
   let currentDate = new Date()
   const getTimePart = method => currentDate[method]().toString().padStart(2, '0')
@@ -69,21 +26,6 @@ const getCurrentDate = () => {
     date: ['getFullYear', 'getMonth', 'getDate'].map(getDatePart).join('-'),
     time: ['getHours', 'getMinutes', 'getSeconds'].map(getTimePart).join(':'),
   }
-}
-
-const showError = message => {
-  HTML.files.innerHTML = 'Disconnected'
-  HTML.conflicts.innerHTML = 'Disconnected'
-  HTML.folderAnswer.innerText = 'Disconnected'
-  HTML.longPollStatus.innerHTML = message
-}
-
-const errorHandler = data => {
-  if (data.error) {
-    showError(data.error)
-    throw new Error(data.error)
-  }
-  return data
 }
 
 const getPostData = data => ({
@@ -135,46 +77,107 @@ const getConflictsGroupsHTML = conflicts => {
   return conflicts.map(({ userName, files }) => getHTMLString(userName, files)).join('')
 }
 
-const getStatus = (initialMessage) => {
-  fetch(API_REQUESTS.myStatus).then(response => response.json()).then(errorHandler).then(data => {
-    if (initialMessage) { HTML.longPollStatus.innerText = initialMessage }
+// Start
+const HTML = [
+  'linkServer',
+  'chooseFolderBtn',
+  'folderInput',
+  'folderAnswer',
+  'connectionStatus',
+  'files',
+  'conflicts',
+  'fileInput',
+  'fileAnswer',
+  'usersFiles',
+  'chooseFileBtnMongo',
+  'fileInputMongo',
+  'fileDateMongo',
+  'fileAnswerMongo',
+  'chat',
+  'chatHeader',
+  'chatBody',
+  'chatStatus',
+  'chatIcon',
+  'iconPath',
+  'unreadMessages',
+  'inputChat',
+  'messages',
+  'token',
+].reduce((acc, id) => (acc[id] = document.querySelector(`#${id}`)) && acc, {})
+
+const getMyToken = () => {
+  fetch(API_REQUESTS.getMyToken).then(response => response.text()).then(token => {
+    alert('Your private token: ' + token)
+  }).catch(err => alert('Error: ' + err))
+}
+
+HTML.token.addEventListener('click', e => {
+  e.preventDefault()
+  getMyToken()
+})
+
+const showError = message => {
+  HTML.files.innerHTML = 'Disconnected'
+  HTML.conflicts.innerHTML = 'Disconnected'
+  HTML.folderAnswer.innerText = 'Disconnected'
+  HTML.connectionStatus.innerHTML = message
+}
+
+const errorHandler = data => {
+  if (data.error) {
+    showError(data.error)
+    throw new Error(data.error)
+  }
+  return data
+}
+
+const getStatus = isInit => {
+  fetch(`${API_REQUESTS.myStatus}/${isInit}`).then(response => response.json()).then(errorHandler).then(data => {
+    if (isInit) { HTML.connectionStatus.innerText = 'Connected' }
     const { myFiles, conflicts } = data
 
-    let timeInfo = 'Last update: ' + getCurrentTime() + '<br><br>'
+    let timeInfo = 'Last update: ' + getCurrentDate().time + '<br><br>'
     HTML.files.innerHTML = timeInfo + (myFiles.length ? getStatusesGroupsHTML(myFiles) : '<p>Have no any changes</p>')
-    HTML.conflicts.innerHTML = conflicts.length ? getConflictsGroupsHTML(conflicts) : '<p>Have no any conflicts</p>'
-    getStatus()
+    if (conflicts.error) {
+      HTML.conflicts.innerHTML = `<p>${conflicts.error}</p>`
+    } else {
+      HTML.conflicts.innerHTML = conflicts.length ? getConflictsGroupsHTML(conflicts) : '<p>Have no any conflicts</p>'
+    }
+    getStatus(false)
   }).catch(err => console.warn('getStatus', err) || showError('Lost connection'))
 }
 
 const setFolder = () => {
   const data = getPostData({ folder: HTML.folderInput.value })
   HTML.folderAnswer.innerText = 'loading...'
-  HTML.longPollStatus.innerText = 'loading...'
+  HTML.connectionStatus.innerText = 'loading...'
   fetch(API_REQUESTS.setFolder, data).then(response => response.text()).then(errorHandler).then(data => {
     HTML.folderAnswer.innerText = data
     HTML.folderInput.value = ''
 
-    // start long poll
-    getStatus('Connected')
+    if (HTML.connectionStatus.innerHTML === 'Lost connection') {
+      getStatus(true)
+    }
   }).catch(err => console.warn('setFolder', err) || showError(err))
 }
 
-const checkServerStatus = () => {
+const checkServerStatus = (isInit) => {
   fetch(API_REQUESTS.checkServerStatus).then(response => response.json()).then(errorHandler).then(data => {
     const { folderPath } = data
 
     if (folderPath) {
-      HTML.longPollStatus.innerText = 'Connected'
+      HTML.connectionStatus.innerText = 'Connected'
       HTML.files.innerHTML = 'loading...'
       HTML.conflicts.innerHTML = 'loading...'
       HTML.folderAnswer.innerText = folderPath
       HTML.folderInput.value = ''
-      getStatus()
+      getStatus(isInit)
     } else {
-      HTML.longPollStatus.innerText = 'Disconnected'
+      HTML.connectionStatus.innerText = 'Disconnected (reconnect after 5s)'
+      setTimeout(() => checkServerStatus(isInit), 5000)
     }
-  }).catch(err => console.warn('checkServerStatus', err))
+  }).catch(err => console.warn('checkServerStatus', err) ||
+    setTimeout(() => checkServerStatus(isInit), 5000))
 }
 
 const checkFile = e => {
@@ -194,17 +197,13 @@ const checkFile = e => {
   }
   fetch(API_REQUESTS.checkFile, data).then(response => response.json()).then(errorFileHandler).then(data => {
     const { fileName, usersFiles } = data
-    HTML.fileAnswer.innerHTML = 'Last update: ' + getCurrentTime() + '<br><br>For file: ' + fileName
+    HTML.fileAnswer.innerHTML = 'Last update: ' + getCurrentDate().time + '<br><br>For file: ' + fileName
     HTML.fileInput.value = ''
     HTML.usersFiles.innerHTML = usersFiles.length
       ? '<br>' + getConflictsGroupsHTML(usersFiles)
       : '<p>Have no users files</p>'
   }).catch(err => console.warn('checkFile', err) || errorFile(err))
 }
-
-HTML.chooseFolderBtn.addEventListener('click', setFolder)
-HTML.fileInput.addEventListener('input', checkFile)
-checkServerStatus()
 
 const checkFileForDay = () => {
   if (!HTML.fileInputMongo.value || !HTML.fileDateMongo.value) {
@@ -241,6 +240,11 @@ const checkFileForDay = () => {
   }).catch(err => HTML.fileAnswerMongo.innerHTML = 'Error: ' + err)
 }
 
+HTML.chooseFolderBtn.addEventListener('click', setFolder)
+HTML.fileInput.addEventListener('input', checkFile)
+HTML.chooseFileBtnMongo.addEventListener('click', checkFileForDay)
+HTML.fileInputMongo.addEventListener('keydown', e => e.key === 'Enter' && checkFileForDay())
+
 const getDefaultValueFolder = () => {
   fetch(API_REQUESTS.getDefaultValueFolder).then(response => response.json()).then(data => {
     const { defaultValue } = data
@@ -249,13 +253,11 @@ const getDefaultValueFolder = () => {
 }
 
 getDefaultValueFolder()
-
-HTML.chooseFileBtnMongo.addEventListener('click', checkFileForDay)
-HTML.fileInputMongo.addEventListener('keydown', e => e.key === 'Enter' && checkFileForDay())
+checkServerStatus(true)
 
 HTML.fileDateMongo.value = getCurrentDate().date
 
-// -----------------------------------------------------------------------------------------
+// CHAT -----------------------------------------------------------------------------------------
 const pathOpened = 'M229.5,71.4l81.6,81.6l35.7-35.7L229.5,0L112.2,117.3l35.7,35.7L229.5,71.4z'
 const pathClosed = 'M229.5,387.6L147.9,306l-35.7,35.7L229.5,459l117.3-117.3L311.1,306L229.5,387.6z'
 
@@ -365,14 +367,14 @@ const startWSChat = (serverWS, userName) => {
       if (shouldUpdate) {
         messagesData[messagesData.length - 1] = {
           text:  messagesData[messagesData.length - 1].text + '\n' + text,
-          time: getCurrentTime(),
+          time: getCurrentDate().time,
           delivered: false,
         }
         return messagesData.length - 1
       } else {
         return -1 + messagesData.push({
           text,
-          time: getCurrentTime(),
+          time: getCurrentDate().time,
           delivered: false,
         })
       }

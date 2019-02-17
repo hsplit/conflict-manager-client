@@ -1,12 +1,10 @@
-const myStatus = require('./myStatus')
-const checkServerStatus = require('./checkServerStatus')
+const setFolder = require('./setFolder')
 const getDefaultValueFolder = require('./getDefaultValueFolder')
 const getServerApi = require('./getServerApi')
 const getMyToken = require('./getMyToken')
 
 module.exports = {
-  myStatus,
-  checkServerStatus,
+  setFolder,
   getDefaultValueFolder,
   getServerApi,
   getMyToken,
