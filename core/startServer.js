@@ -3,6 +3,8 @@ let argv = require('minimist')(process.argv.slice(2))
 let port = argv.port || ports[0]
 
 const opn = require('opn')
+const getFolderPath = require('services/folder').getFolderPath
+const getMyStatus = require('services/ownStatuses').getMyStatus
 
 const startServer = (_port, app) => {
   app.listen(_port, () => console.log(`Start on http://localhost:${_port}/`) || opn(`http://localhost:${_port}/`))
@@ -18,4 +20,10 @@ const startServer = (_port, app) => {
     })
 }
 
-module.exports = app => startServer(port, app)
+module.exports = app => {
+  if (getFolderPath() !== undefined) {
+    getMyStatus('true', () => startServer(port, app))
+  } else {
+    startServer(port, app)
+  }
+}
