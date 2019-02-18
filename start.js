@@ -11,7 +11,6 @@ const app = express()
 
 app.use(security)
 app.use(express.static(__dirname + '/public'))
-app.get('/favicon.ico', (request, response) => response.end(''))
 app.use('/', router)
 
 // 404

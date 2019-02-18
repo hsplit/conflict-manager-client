@@ -6,6 +6,7 @@ const { STATUS_CHECKER_DELAY } = require('core/constants')
 
 const folderService = require('services/folder')
 const serverService = require('services/server')
+const pushService = require('services/push')
 
 const ERROR = { error: `Can't open repository.` }
 const SERVER_ERROR = { error: `Can't connect to server` }
@@ -50,10 +51,16 @@ const _statusChecker = () => new Promise(resolve => {
       let info = statuses.map(_statusesToObj).filter(el => Object.values(el.statuses).some(Boolean))
 
       serverService.getConflicts(info).then(data => {
+        if (!_isEqual(_storage.conflicts, data)) {
+          pushService.pushNotification()
+        }
         _storage = { myFiles: info, conflicts: data }
         resolve()
         setTimeout(_statusChecker, STATUS_CHECKER_DELAY)
       }).catch(() => setTimeout(() => {
+        if (!_isEqual(_storage.conflicts, SERVER_ERROR)) {
+          pushService.pushNotification()
+        }
         _storage = { myFiles: info, conflicts: SERVER_ERROR }
         resolve()
         _statusChecker()

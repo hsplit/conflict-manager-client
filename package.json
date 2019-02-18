@@ -1,6 +1,6 @@
 {
   "name": "conflict-manager-client",
-  "version": "0.12.5",
+  "version": "0.13.0",
   "description": "git conflict manager client",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,8 @@
     "node-fetch": "^2.3.0",
     "node-machine-id": "^1.1.10",
     "nodegit": "^0.23.0",
-    "opn": "^5.4.0"
+    "opn": "^5.4.0",
+    "web-push": "^3.3.3"
   },
   "devDependencies": {
     "nodemon": "^1.18.8"

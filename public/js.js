@@ -3,6 +3,7 @@ const API_ROUTES = {
   settings: `${API}/settings`,
   connection: `${API}/connection`,
   server: `${API}/server`,
+  push: `${API}/push`,
 }
 const API_REQUESTS = {
   setFolder: `${API_ROUTES.settings}/setfolder`,
@@ -15,6 +16,9 @@ const API_REQUESTS = {
 
   checkFile: `${API_ROUTES.server}/checkfile`,
   checkFileForDay: `${API_ROUTES.server}/checkfileforday`,
+
+  getPublicKey: `${API_ROUTES.push}/getpublickey`,
+  subscribe: `${API_ROUTES.push}/subscribe`,
 }
 
 // Common
@@ -425,3 +429,50 @@ const getServerApi = () => {
 }
 
 getServerApi()
+
+// PUSH -----------------------------------------------------------------------------------------
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+  const urlB64ToUint8Array = base64String => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4)
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+
+    const rawData = window.atob(base64)
+    const outputArray = new Uint8Array(rawData.length)
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i)
+    }
+    return outputArray
+  }
+
+  const connect = subscription => fetch(API_REQUESTS.subscribe, getPostData(subscription))
+    .catch(error => console.warn('Error fetching subscribe/connect', error))
+
+  const subscribe = (sw, publicKey) => {
+    sw.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlB64ToUint8Array(publicKey),
+    })
+      .then(subscription => connect(subscription))
+      .catch(err => console.warn('SW fail subscribe', err))
+  }
+
+  fetch(API_REQUESTS.getPublicKey).then(response => response.json()).then(data => {
+    const { publicKey } = data
+
+    navigator.serviceWorker.register('sw.js').then(sw => {
+      navigator.serviceWorker.ready.then(_sw => {
+        _sw.pushManager.getSubscription().then(subscription => {
+          if (subscription) {
+            connect(subscription)
+          } else {
+            subscribe(sw, publicKey)
+          }
+
+        }).catch(error => console.warn('Service Worker getSubscription Error', error))
+      })
+
+    }).catch(error => console.warn('Service Worker Register Error', error))
+
+  }).catch(err => console.warn('Can\'t get public key', err))
+}
