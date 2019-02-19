@@ -1,11 +1,14 @@
 {
   "name": "conflict-manager-client",
-  "version": "0.13.2",
+  "version": "0.14.0",
   "description": "git conflict manager client",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon start --port=5011",
-    "start": "node start --port=5011"
+    "dev": "nodemon start --port=5011 --dev=true",
+    "start": "node start --port=5011",
+    "electron": "node start --port=5011 --electron=true",
+    "electron-dev": "node start --port=5011 --electron=true --dev=true",
+    "build": "electron-packager . CoMa_Desktop --platform=win32 --arch=x64"
   },
   "keywords": [
     "git",
@@ -14,6 +17,7 @@
   "author": "H.Split",
   "license": "ISC",
   "dependencies": {
+    "electron": "^4.0.5",
     "express": "^4.16.4",
     "lodash": "^4.17.11",
     "minimist": "^1.2.0",
@@ -25,6 +29,7 @@
     "web-push": "^3.3.3"
   },
   "devDependencies": {
+    "electron-packager": "^13.0.1",
     "nodemon": "^1.18.8"
   }
 }

@@ -1,4 +1,11 @@
-const API = window.origin || 'http://localhost:5011'
+let API = window.origin || 'http://localhost:5011'
+let isElectron
+
+try {
+  API = require('electron').remote.getGlobal('sharedObject').api
+  isElectron = true
+} catch (e) {}
+
 const API_ROUTES = {
   settings: `${API}/settings`,
   connection: `${API}/connection`,
@@ -432,7 +439,7 @@ const getServerApi = () => {
 getServerApi()
 
 // PUSH -----------------------------------------------------------------------------------------
-if ('serviceWorker' in navigator && 'PushManager' in window) {
+if ('serviceWorker' in navigator && 'PushManager' in window && !isElectron) {
   const urlB64ToUint8Array = base64String => {
     const padding = '='.repeat((4 - base64String.length % 4) % 4)
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')

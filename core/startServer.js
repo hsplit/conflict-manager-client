@@ -1,16 +1,25 @@
 let ports = [5011, 5111, 5211]
 let argv = require('minimist')(process.argv.slice(2))
 let port = argv.port || ports[0]
+let electron = argv.electron
+let dev = argv.dev || ''
 
+const exec = require('child_process').exec
 const opn = require('opn')
 const getFolderPath = require('services/folder').getFolderPath
 const getMyStatus = require('services/ownStatuses').getMyStatus
 
 const startServer = (_port, app) => {
-  app.listen(_port, () => console.log(`Start on http://localhost:${_port}/`) || opn(`http://localhost:${_port}/`))
-    .on('error', err => {
+  app.listen(_port, () => {
+    console.log(`Start on http://localhost:${_port}/`)
+    !electron && opn(`http://localhost:${_port}/`)
+    electron && exec(`electron . --api=http://localhost:${_port} --dev=${dev}`, (error, stdout, stderr) => {
+      console.log('stdout:', stdout)
+      console.log('stderr:', stderr)
+      error && console.log('exec error', error)
+      })
+  }).on('error', err => {
       console.log(err)
-
       const indexCurrentPort = ports.indexOf(_port)
       const isLastPort = indexCurrentPort === ports.length - 1
       if (!isLastPort ) {
