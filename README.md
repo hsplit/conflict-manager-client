@@ -10,3 +10,7 @@ Application to help your team prevent conflicts before commit.
 - Sockets
 - Web notifications
 - Desktop app https://electronjs.org
+
+#### Dependencies
+- Server: https://github.com/hsplit/conflict-manager-server
+- Mobile App: https://github.com/hsplit/conflict-manager-mobile-app
