@@ -30,10 +30,8 @@ const _statusesToObj = status => {
   }
 }
 const _onError = () => {
-  setTimeout(() => {
-    _storage = ERROR
-    _statusChecker()
-  }, STATUS_CHECKER_DELAY)
+  _running = false
+  _storage = ERROR
 }
 
 const _statusChecker = () => new Promise(resolve => {

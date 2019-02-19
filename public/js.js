@@ -154,12 +154,13 @@ const getStatus = isInit => {
 const setFolder = () => {
   const data = getPostData({ folder: HTML.folderInput.value })
   HTML.folderAnswer.innerText = 'loading...'
+  const prevStatus = HTML.connectionStatus.innerText
   HTML.connectionStatus.innerText = 'loading...'
   fetch(API_REQUESTS.setFolder, data).then(response => response.text()).then(errorHandler).then(data => {
     HTML.folderAnswer.innerText = data
     HTML.folderInput.value = ''
 
-    if (HTML.connectionStatus.innerHTML === 'Lost connection') {
+    if (prevStatus !== 'Disconnected (reconnect after 5s)' || prevStatus !== 'Connected') {
       getStatus(true)
     }
   }).catch(err => console.warn('setFolder', err) || showError(err))
